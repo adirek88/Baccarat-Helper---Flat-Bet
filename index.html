@@ -47,7 +47,7 @@
   .brand{display:flex; align-items:center; gap:10px; font-weight:900}
   .badge{background:linear-gradient(140deg,#3b53ff33,#ff3b3b33); border:1px solid var(--border); padding:6px 10px; border-radius:999px; font-size:12px; color:#cfe1ff}
   .spacer{flex:1}
-  .h-actions{display:flex; gap:8px}
+  .h-actions{display:flex; gap:8px; flex-wrap:wrap}
   .mini{border:none; border-radius:12px; padding:8px 12px; font-weight:900; color:#fff; cursor:pointer}
   .mini.b{background:var(--b)} .mini.p{background:var(--p)} .mini.t{background:var(--t)}
   .mini.u{background:#2b335f} .mini.r{background:#3a2a2a}
@@ -62,7 +62,7 @@
   @media (max-width:980px){ .grid{grid-template-columns:1fr} }
   .card{background:linear-gradient(180deg, var(--glass), transparent); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
   .title{display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:8px}
-  .hint{font-size:12px; color:#9fb0d6}
+  .hint{font-size:12px; color:var(--muted)}
   .sticky{position:sticky; top:92px; align-self:start}
   @media (max-width:980px){ .sticky{position:static} }
 
@@ -114,9 +114,9 @@
   /* Hit Columns (ไม้1..ไม้5 + FAIL) */
   .hitlist{ display:grid; grid-template-columns: repeat(6, minmax(72px,1fr)); gap:10px; margin-top:6px; }
   .hit-col{ text-align:center; padding:6px 4px 10px; border-bottom:2px dashed var(--border); border-radius:4px; }
-  .hit-col.ok{ border-color:rgba(46,204,113,.55); }
-  .hit-col.fail{ border-color:rgba(255,93,108,.65); }
-  .hit-label{ font-size:12px; color:var(--muted); letter-spacing:.2px; }
+  .hit-col.ok{ border-color: rgba(46,204,113,.55); }
+  .hit-col.fail{ border-color: rgba(255,93,108,.65); }
+  .hit-label{ font-size:12px; color: var(--muted); letter-spacing:.2px; }
   .hit-val{ margin-top:4px; font-size:22px; font-weight:900; color:#eaf1ff; }
   @media (max-width:600px){ .hitlist{ grid-template-columns: repeat(3, minmax(90px,1fr)); gap:8px; } .hit-val{ font-size:20px; } }
 
@@ -124,7 +124,7 @@
   .controls{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
   .group{background:#0e1533; border:1px solid var(--border); border-radius:12px; padding:10px}
   .group label{font-size:12px; color:#9fb0d6; display:block; margin-bottom:6px}
-  .group input[type="number"], .group select, .group input[type="tel"]{
+  .group input[type="number"], .group select, .group input[type="tel"], .group input[type="range"]{
     width:100%; background:#0a1130; color:#eef3ff; border:1px solid rgba(255,255,255,.12);
     border-radius:10px; padding:8px 10px; font-weight:800
   }
@@ -150,6 +150,10 @@
       <button class="mini t" id="tbT">T</button>
       <button class="mini u" id="tbU">Undo</button>
       <button class="mini r" id="tbR">Reset</button>
+      <button class="mini u" id="tbShare" title="คัดลอกลิงก์พร้อมสถานะ">Share</button>
+      <button class="mini u" id="tbExport" title="บันทึกสถานะเป็นไฟล์ JSON">Export</button>
+      <button class="mini u" id="tbImportBtn" title="นำเข้าสถานะจากไฟล์ JSON">Import</button>
+      <input type="file" id="tbImport" accept="application/json" style="display:none" />
     </div>
     <div class="spacer"></div>
     <span id="tbBadge" class="h-callout skip">SKIP</span>
@@ -233,7 +237,7 @@
               <input type="number" id="winN" value="8" min="3" max="30" />
             </div>
             <div class="group">
-              <label>เกณฑ์ \u005chat p (≥)</label>
+              <label>เกณฑ์ p-hat (≥)</label>
               <input type="number" id="thr" value="0.52" min="0.50" max="0.65" step="0.01" />
             </div>
             <div class="group">
@@ -257,11 +261,11 @@
               <div class="v" id="winCount" style="margin-top:6px">0</div>
             </div>
             <div class="group">
-              <label>\u005chat p_B</label>
+              <label>p-hat_B</label>
               <div class="v" id="pHatB" style="margin-top:6px">–</div>
             </div>
             <div class="group">
-              <label>\u005chat p_P</label>
+              <label>p-hat_P</label>
               <div class="v" id="pHatP" style="margin-top:6px">–</div>
             </div>
             <div class="group">
@@ -293,7 +297,6 @@
             </div>
             <div class="group">
               <label>Pause หลัง HIT (ไม้)</label>
-              <!-- มือถือพิมพ์ง่าย -->
               <input type="tel" inputmode="numeric" pattern="[0-9]*" id="pauseHands" value="2" />
             </div>
             <div class="group switch">
@@ -360,6 +363,7 @@
   const el = {
     hudBadge: $('hudBadge'), reason: $('reason'),
     tbB:$('tbB'), tbP:$('tbP'), tbT:$('tbT'), tbU:$('tbU'), tbR:$('tbR'), tbBadge:$('tbBadge'),
+    tbShare:$('tbShare'), tbExport:$('tbExport'), tbImportBtn:$('tbImportBtn'), tbImport:$('tbImport'),
     timeline:$('timeline'), stN:$('stN'), stB:$('stB'), stP:$('stP'), stT:$('stT'),
     btnB:$('btnB'), btnP:$('btnP'), btnT:$('btnT'), btnUndo:$('btnUndo'), btnReset:$('btnReset'),
     entryMode:$('entryMode'), winN:$('winN'), thr:$('thr'), antiPing:$('antiPing'),
@@ -438,7 +442,7 @@
       if (data.cycleStats) { state.cycleStats = data.cycleStats; renderCycleSummary(); }
     }catch(e){ console.warn('Restore failed:', e); }
   }
-  // autosave เผื่อรีเฟรช/ปิดแท็บทันที
+  // autosave
   document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState!=='visible') saveAll(); });
   window.addEventListener('pagehide', saveAll);
   setInterval(saveAll, 2000);
@@ -484,9 +488,9 @@
 
   /* -------------------- Decision (No-Lock + Cycle) -------------------- */
   function decide(){
-    const N = clamp(el.winN.value,3,50);
+    const N = clamp(el.winN.value,3,30);
     const thr = Math.min(Math.max(parseFloat(el.thr.value||'0.52'),0.5),0.75);
-    const antiPingLen = clamp(el.antiPing.value,3,10);
+    const antiPingLen = clamp(el.antiPing.value,3,8);
     const useEMA = el.useEMA.checked;
     const alpha = Math.min(Math.max(parseFloat(el.emaAlpha.value||'0.30'),0.10),0.60);
     const mode = el.entryMode.value;
@@ -497,20 +501,42 @@
     if(state.cycle.pauseRemain>0){
       setHUD('SKIP',`พักหลัง HIT • เหลือ ${state.cycle.pauseRemain} ไม้`);
       setCycle('PAUSE',`พัก ${state.cycle.pauseRemain} ไม้`,state.cycle.lastSuggested);
-      renderCycleSummary(); return;
+      renderCycleSummary();
+      el.altLen.textContent = String(alternationLen(state.seq));
+      el.winCount.textContent = '0';
+      el.pHatB.textContent = '–';
+      el.pHatP.textContent = '–';
+      return;
     }
 
     const seq=state.seq; const last=seq[seq.length-1];
     if(el.skipAfterTie.checked && last==='T'){
       setHUD('SKIP','เพิ่งออก Tie ➜ ข้าม 1 ไม้');
       setCycle(state.cycle.active?'ACTIVE':'IDLE', state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน', state.cycle.lastSuggested);
-      renderCycleSummary(); return;
+      renderCycleSummary();
+      el.altLen.textContent = String(alternationLen(state.seq));
+      el.winCount.textContent = '0';
+      el.pHatB.textContent = '–';
+      el.pHatP.textContent = '–';
+      return;
     }
 
     const altL = alternationLen(seq);
     const antiPingActive = altL >= antiPingLen;
     const r = useEMA ? laplaceFromEMA(seq,alpha) : laplaceFromWindow(lastWindowBP(seq,N));
     const {pB,pP,Np} = r;
+
+    // อัปเดตตัวเลขโชว์
+    el.altLen.textContent = String(altL);
+    if (Np === 0) {
+      el.winCount.textContent = '0';
+      el.pHatB.textContent = '–';
+      el.pHatP.textContent = '–';
+    } else {
+      el.winCount.textContent = String(Np);
+      el.pHatB.textContent = pB.toFixed(3);
+      el.pHatP.textContent = pP.toFixed(3);
+    }
 
     if(Np===0){
       setHUD('SKIP','ยังไม่มีข้อมูล B/P เพียงพอ');
@@ -525,10 +551,10 @@
 
     const passB = pB>=thr, passP = pP>=thr;
     let suggested=null, txt='';
-    if(mode==='BONLY'){ if(passB){ suggested='B'; txt=`\\u005chat p_B = ${pB.toFixed(3)} ≥ ${thr.toFixed(2)} ➜ แทง B`; } }
+    if(mode==='BONLY'){ if(passB){ suggested='B'; txt=`p-hat_B = ${pB.toFixed(3)} ≥ ${thr.toFixed(2)} ➜ แทง B`; } }
     else{
-      if(passB && (!passP || pB>=pP)){ suggested='B'; txt=`\\u005chat p_B = ${pB.toFixed(3)} ≥ ${thr.toFixed(2)} ➜ แทง B`; }
-      else if(passP && (!passB || pP>pB)){ suggested='P'; txt=`\\u005chat p_P = ${pP.toFixed(3)} ≥ ${thr.toFixed(2)} ➜ แทง P`; }
+      if(passB && (!passP || pB>=pP)){ suggested='B'; txt=`p-hat_B = ${pB.toFixed(3)} ≥ ${thr.toFixed(2)} ➜ แทง B`; }
+      else if(passP && (!passB || pP>pB)){ suggested='P'; txt=`p-hat_P = ${pP.toFixed(3)} ≥ ${thr.toFixed(2)} ➜ แทง P`; }
     }
 
     if(suggested){
@@ -537,7 +563,7 @@
       if(!state.cycle.active){ state.cycle.active=true; state.cycle.tries=0; }
       setCycle('ACTIVE',`Try ${state.cycle.tries+1}/${state.cycle.max}`,state.cycle.lastSuggested);
     }else{
-      setHUD('SKIP',`\\u005chat p_B=${pB.toFixed(3)}, p_P=${pP.toFixed(3)} (thr=${thr.toFixed(2)})`);
+      setHUD('SKIP',`p-hat_B=${pB.toFixed(3)}, p-hat_P=${pP.toFixed(3)} (thr=${thr.toFixed(2)})`);
       setCycle(state.cycle.active?'ACTIVE':'IDLE', state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน', state.cycle.lastSuggested);
     }
     renderCycleSummary();
@@ -592,6 +618,7 @@
     }
   }
 
+  // ปุ่มกด
   el.btnB.onclick=()=>push('B'); el.btnP.onclick=()=>push('P'); el.btnT.onclick=()=>push('T');
   el.btnUndo.onclick=()=>{ if(state.seq.length===0) return; replayAll(state.seq.slice(0,-1)); saveAll(); };
   el.btnReset.onclick=()=>{ if(confirm('ล้างข้อมูลทั้งหมดและรีเซ็ตสถานะใช่ไหม?')){ state.seq=[]; state.cycle=resetCycle(); resetCycleStats(); renderTimeline(); statsAll(); decide(); clearStore(); } };
@@ -599,6 +626,38 @@
   // Header mirrors
   $('tbB').onclick=()=>el.btnB.click(); $('tbP').onclick=()=>el.btnP.click(); $('tbT').onclick=()=>el.btnT.click();
   $('tbU').onclick=()=>el.btnUndo.click(); $('tbR').onclick=()=>el.btnReset.click();
+
+  // Share / Export / Import
+  if (el.tbShare){
+    el.tbShare.onclick = async () => {
+      writeStore(serializeAll());
+      try{
+        await navigator.clipboard.writeText(location.href);
+        setHUD('SKIP','คัดลอกลิงก์พร้อมสถานะแล้ว ✅');
+      }catch{
+        setHUD('SKIP','คัดลอกไม่สำเร็จ ลองคัดลอกจากแอดเดรสบาร์');
+      }
+    };
+  }
+  if (el.tbExport){
+    el.tbExport.onclick = () => {
+      const blob = new Blob([serializeAll()], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'baccarat-helper-state.json';
+      a.click();
+    };
+  }
+  if (el.tbImportBtn && el.tbImport){
+    el.tbImportBtn.onclick = () => el.tbImport.click();
+    el.tbImport.onchange = async (e) => {
+      const file = e.target.files?.[0]; if(!file) return;
+      const text = await file.text();
+      writeStore(text);
+      restoreAll();
+      setHUD('SKIP','นำเข้าข้อมูลแล้ว ✅');
+    };
+  }
 
   // Inputs → recalc + save
   ['entryMode','winN','thr','antiPing','skipAfterTie','useEMA','emaAlpha','cycleMax','tieNoCount']
@@ -628,9 +687,23 @@
     });
   }
 
+  // คีย์ลัดคีย์บอร์ด (B/P/T/U/R)
+  document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement?.tagName?.toLowerCase?.();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key?.toLowerCase?.();
+    if (!k) return;
+    if (k === 'b') el.btnB.click();
+    else if (k === 'p') el.btnP.click();
+    else if (k === 't') el.btnT.click();
+    else if (k === 'u') el.btnUndo.click();
+    else if (k === 'r') el.btnReset.click();
+  });
+
   /* -------------------- Init -------------------- */
-  renderTimeline(); statsAll(); renderCycleSummary(); decide();
+  renderTimeline(); statsAll(); renderCycleSummary();
   restoreAll(); // โหลดของเก่า (ถ้ามี)
+  decide();
 })();
 </script>
 </body>
