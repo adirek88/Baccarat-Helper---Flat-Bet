@@ -29,13 +29,7 @@
     transform: scale(var(--zoom)); transform-origin: top left;
     width: calc(100% / var(--zoom));
   }
-  /* มือถือ: ปิด scale เพื่อให้ input พิมพ์ได้ */
-  @media (pointer: coarse){
-    body{ transform:none; width:auto; }
-  }
-
-  /* แตะติดง่ายบนมือถือ */
-  button, input, select { touch-action: manipulation; }
+  @media (pointer: coarse){ body{ transform:none; width:auto; } }
 
   /* Header */
   .header{
@@ -47,10 +41,6 @@
   .brand{display:flex; align-items:center; gap:10px; font-weight:900}
   .badge{background:linear-gradient(140deg,#3b53ff33,#ff3b3b33); border:1px solid var(--border); padding:6px 10px; border-radius:999px; font-size:12px; color:#cfe1ff}
   .spacer{flex:1}
-  .h-actions{display:flex; gap:8px; flex-wrap:wrap}
-  .mini{border:none; border-radius:12px; padding:8px 12px; font-weight:900; color:#fff; cursor:pointer}
-  .mini.b{background:var(--b)} .mini.p{background:var(--p)} .mini.t{background:var(--t)}
-  .mini.u{background:#2b335f} .mini.r{background:#3a2a2a}
   .h-callout{padding:8px 12px; border-radius:999px; font-weight:900; border:1px solid var(--border)}
   .h-callout.playB{background:rgba(231,76,60,.25); border-color:rgba(231,76,60,.5)}
   .h-callout.playP{background:rgba(46,134,222,.25); border-color:rgba(46,134,222,.5)}
@@ -98,7 +88,7 @@
   .dot{width:16px; height:16px; border-radius:50%; box-shadow:inset 0 -2px 0 rgba(0,0,0,.25)}
   .dot.b{background:var(--b)} .dot.p{background:var(--p)} .dot.t{background:var(--t)}
 
-  /* Inline Stats: B P T + Total */
+  /* Inline Stats */
   .inline-stats{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-top:8px; }
   .stat-pill{ display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#eaf1ff; }
   .stat-pill .ball{
@@ -111,7 +101,7 @@
   .stat-total{ margin-left:4px; font-size:18px; font-weight:900; }
   .stat-total span{ margin-left:6px; }
 
-  /* Hit Columns (ไม้1..ไม้5 + FAIL) */
+  /* Hit Columns */
   .hitlist{ display:grid; grid-template-columns: repeat(6, minmax(72px,1fr)); gap:10px; margin-top:6px; }
   .hit-col{ text-align:center; padding:6px 4px 10px; border-bottom:2px dashed var(--border); border-radius:4px; }
   .hit-col.ok{ border-color: rgba(46,204,113,.55); }
@@ -144,17 +134,6 @@
   <!-- Header -->
   <div class="header">
     <div class="brand">🂡 Baccarat Helper <span class="badge">Modern Glass UI</span></div>
-    <div class="h-actions">
-      <button class="mini b" id="tbB">B</button>
-      <button class="mini p" id="tbP">P</button>
-      <button class="mini t" id="tbT">T</button>
-      <button class="mini u" id="tbU">Undo</button>
-      <button class="mini r" id="tbR">Reset</button>
-      <button class="mini u" id="tbShare" title="คัดลอกลิงก์พร้อมสถานะ">Share</button>
-      <button class="mini u" id="tbExport" title="บันทึกสถานะเป็นไฟล์ JSON">Export</button>
-      <button class="mini u" id="tbImportBtn" title="นำเข้าสถานะจากไฟล์ JSON">Import</button>
-      <input type="file" id="tbImport" accept="application/json" style="display:none" />
-    </div>
     <div class="spacer"></div>
     <span id="tbBadge" class="h-callout skip">SKIP</span>
   </div>
@@ -206,7 +185,6 @@
 
         <div class="timeline" id="timeline" title="ผลย้อนหลัง (ล่าสุดอยู่ขวา)"></div>
 
-        <!-- Inline stats -->
         <div class="inline-stats" aria-label="B P T Total">
           <span class="stat-pill" title="Banker ทั้งหมด"><span class="ball b">B</span><span class="stat-count" id="stB">0</span></span>
           <span class="stat-pill" title="Player ทั้งหมด"><span class="ball p">P</span><span class="stat-count" id="stP">0</span></span>
@@ -362,8 +340,7 @@
   const $ = id => document.getElementById(id);
   const el = {
     hudBadge: $('hudBadge'), reason: $('reason'),
-    tbB:$('tbB'), tbP:$('tbP'), tbT:$('tbT'), tbU:$('tbU'), tbR:$('tbR'), tbBadge:$('tbBadge'),
-    tbShare:$('tbShare'), tbExport:$('tbExport'), tbImportBtn:$('tbImportBtn'), tbImport:$('tbImport'),
+    tbBadge:$('tbBadge'),
     timeline:$('timeline'), stN:$('stN'), stB:$('stB'), stP:$('stP'), stT:$('stT'),
     btnB:$('btnB'), btnP:$('btnP'), btnT:$('btnT'), btnUndo:$('btnUndo'), btnReset:$('btnReset'),
     entryMode:$('entryMode'), winN:$('winN'), thr:$('thr'), antiPing:$('antiPing'),
@@ -442,7 +419,6 @@
       if (data.cycleStats) { state.cycleStats = data.cycleStats; renderCycleSummary(); }
     }catch(e){ console.warn('Restore failed:', e); }
   }
-  // autosave
   document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState!=='visible') saveAll(); });
   window.addEventListener('pagehide', saveAll);
   setInterval(saveAll, 2000);
@@ -526,7 +502,6 @@
     const r = useEMA ? laplaceFromEMA(seq,alpha) : laplaceFromWindow(lastWindowBP(seq,N));
     const {pB,pP,Np} = r;
 
-    // อัปเดตตัวเลขโชว์
     el.altLen.textContent = String(altL);
     if (Np === 0) {
       el.winCount.textContent = '0';
@@ -618,46 +593,10 @@
     }
   }
 
-  // ปุ่มกด
+  // ปุ่มกดหลัก
   el.btnB.onclick=()=>push('B'); el.btnP.onclick=()=>push('P'); el.btnT.onclick=()=>push('T');
   el.btnUndo.onclick=()=>{ if(state.seq.length===0) return; replayAll(state.seq.slice(0,-1)); saveAll(); };
   el.btnReset.onclick=()=>{ if(confirm('ล้างข้อมูลทั้งหมดและรีเซ็ตสถานะใช่ไหม?')){ state.seq=[]; state.cycle=resetCycle(); resetCycleStats(); renderTimeline(); statsAll(); decide(); clearStore(); } };
-
-  // Header mirrors
-  $('tbB').onclick=()=>el.btnB.click(); $('tbP').onclick=()=>el.btnP.click(); $('tbT').onclick=()=>el.btnT.click();
-  $('tbU').onclick=()=>el.btnUndo.click(); $('tbR').onclick=()=>el.btnReset.click();
-
-  // Share / Export / Import
-  if (el.tbShare){
-    el.tbShare.onclick = async () => {
-      writeStore(serializeAll());
-      try{
-        await navigator.clipboard.writeText(location.href);
-        setHUD('SKIP','คัดลอกลิงก์พร้อมสถานะแล้ว ✅');
-      }catch{
-        setHUD('SKIP','คัดลอกไม่สำเร็จ ลองคัดลอกจากแอดเดรสบาร์');
-      }
-    };
-  }
-  if (el.tbExport){
-    el.tbExport.onclick = () => {
-      const blob = new Blob([serializeAll()], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'baccarat-helper-state.json';
-      a.click();
-    };
-  }
-  if (el.tbImportBtn && el.tbImport){
-    el.tbImportBtn.onclick = () => el.tbImport.click();
-    el.tbImport.onchange = async (e) => {
-      const file = e.target.files?.[0]; if(!file) return;
-      const text = await file.text();
-      writeStore(text);
-      restoreAll();
-      setHUD('SKIP','นำเข้าข้อมูลแล้ว ✅');
-    };
-  }
 
   // Inputs → recalc + save
   ['entryMode','winN','thr','antiPing','skipAfterTie','useEMA','emaAlpha','cycleMax','tieNoCount']
@@ -702,7 +641,7 @@
 
   /* -------------------- Init -------------------- */
   renderTimeline(); statsAll(); renderCycleSummary();
-  restoreAll(); // โหลดของเก่า (ถ้ามี)
+  restoreAll(); 
   decide();
 })();
 </script>
