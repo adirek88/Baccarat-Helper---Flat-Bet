@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Baccarat Helper — Modern Glass (Full, Mobile+Autosave)</title>
+<title>Baccarat Helper — Conservative Stable</title>
 <style>
   :root{
     --bg:#060a16; --grad1:#0b1430; --grad2:#0a1026;
@@ -11,8 +11,7 @@
     --muted:#9fb0d6; --text:#eef3ff; --shadow:0 14px 36px rgba(0,0,0,.45);
     --radius:18px;
     --b:#e74c3c; --p:#2e86de; --t:#2ecc71;
-    --ok:#25c06d; --warn:#ffb020; --bad:#ff5d6c;
-    --zoom: 1; /* ปิดบนมือถือด้านล่างเพื่อแก้บั๊กคีย์บอร์ด */
+    --zoom:1;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -46,13 +45,12 @@
   .h-callout.playP{background:rgba(46,134,222,.25); border-color:rgba(46,134,222,.5)}
   .h-callout.skip{ background:rgba(255,93,108,.22); border-color:rgba(255,93,108,.45)}
 
-  /* Layout */
   .wrap{max-width:1200px; margin:0 auto; display:grid; gap:14px}
   .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:14px; align-items:start}
   @media (max-width:980px){ .grid{grid-template-columns:1fr} }
   .card{background:linear-gradient(180deg, var(--glass), transparent); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
   .title{display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:8px}
-  .hint{font-size:12px; color:var(--muted)}
+  .hint{font-size:12px; color:#9fb0d6}
   .sticky{position:sticky; top:92px; align-self:start}
   @media (max-width:980px){ .sticky{position:static} }
 
@@ -70,10 +68,7 @@
   .reason{color:#c7d3ff; font-size:14px}
 
   /* Quick summary */
-  .cycle-quick{
-    display:grid; gap:10px;
-    background:#0f1536cc; border:1px solid var(--border); border-radius:14px; padding:10px 12px;
-  }
+  .cycle-quick{display:grid; gap:10px; background:#0f1536cc; border:1px solid var(--border); border-radius:14px; padding:10px 12px}
   .chips{display:flex; gap:8px; flex-wrap:wrap}
   .chip{background:#0d1533; border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-weight:800; color:#cfe1ff; font-size:13px}
 
@@ -96,7 +91,7 @@
     display:inline-flex; align-items:center; justify-content:center;
     color:#fff; font-weight:900; font-size:12px; box-shadow:inset 0 -2px 0 rgba(0,0,0,.25);
   }
-  .ball.b{ background:var(--b); } .ball.p{ background:var(--p); } .ball.t{ background:var(--t); }
+  .ball.b{ background:var(--b);} .ball.p{ background:var(--p);} .ball.t{ background:var(--t);}
   .stat-count{ font-size:18px; }
   .stat-total{ margin-left:4px; font-size:18px; font-weight:900; }
   .stat-total span{ margin-left:6px; }
@@ -104,9 +99,9 @@
   /* Hit Columns */
   .hitlist{ display:grid; grid-template-columns: repeat(6, minmax(72px,1fr)); gap:10px; margin-top:6px; }
   .hit-col{ text-align:center; padding:6px 4px 10px; border-bottom:2px dashed var(--border); border-radius:4px; }
-  .hit-col.ok{ border-color: rgba(46,204,113,.55); }
-  .hit-col.fail{ border-color: rgba(255,93,108,.65); }
-  .hit-label{ font-size:12px; color: var(--muted); letter-spacing:.2px; }
+  .hit-col.ok{ border-color:rgba(46,204,113,.55); }
+  .hit-col.fail{ border-color:rgba(255,93,108,.65); }
+  .hit-label{ font-size:12px; color:var(--muted); letter-spacing:.2px; }
   .hit-val{ margin-top:4px; font-size:22px; font-weight:900; color:#eaf1ff; }
   @media (max-width:600px){ .hitlist{ grid-template-columns: repeat(3, minmax(90px,1fr)); gap:8px; } .hit-val{ font-size:20px; } }
 
@@ -133,7 +128,7 @@
 <body>
   <!-- Header -->
   <div class="header">
-    <div class="brand">🂡 Baccarat Helper <span class="badge">Modern Glass UI</span></div>
+    <div class="brand">🂡 Baccarat Helper <span class="badge">Conservative Stable</span></div>
     <div class="spacer"></div>
     <span id="tbBadge" class="h-callout skip">SKIP</span>
   </div>
@@ -143,7 +138,7 @@
     <section class="hud card">
       <div class="hud-row">
         <div id="hudBadge" class="hud-pill skip">SKIP</div>
-        <div class="reason" id="reason">เริ่มใช้งาน: บันทึกผล B/P/T สัก 6–10 ไม้เพื่อให้ระบบประเมิน</div>
+        <div class="reason" id="reason">บันทึกผล B/P/T สัก 6–10 ไม้เพื่อให้ระบบประเมิน</div>
       </div>
 
       <div class="cycle-quick" aria-label="สรุปรอบ">
@@ -185,6 +180,7 @@
 
         <div class="timeline" id="timeline" title="ผลย้อนหลัง (ล่าสุดอยู่ขวา)"></div>
 
+        <!-- Inline stats -->
         <div class="inline-stats" aria-label="B P T Total">
           <span class="stat-pill" title="Banker ทั้งหมด"><span class="ball b">B</span><span class="stat-count" id="stB">0</span></span>
           <span class="stat-pill" title="Player ทั้งหมด"><span class="ball p">P</span><span class="stat-count" id="stP">0</span></span>
@@ -197,7 +193,7 @@
       <section class="card sticky collapsible" id="settingsSection">
         <div class="title">
           <strong>ตัวกรอง & เงื่อนไขเข้า</strong>
-          <div class="hint">ลอจิกเดิม</div>
+          <div class="hint">ลอจิกเดิม • โหมด Conservative (ปลายรอบเข้มขึ้น)</div>
           <button class="collapse-btn" id="btnColSettings" aria-expanded="true">ย่อ</button>
         </div>
 
@@ -207,7 +203,7 @@
               <label>โหมดเข้า</label>
               <select id="entryMode">
                 <option value="BONLY">Banker-only</option>
-                <option value="TWOSIDED">Two-Sided (B หรือ P)</option>
+                <option value="TWOSIDED" selected>Two-Sided (B หรือ P)</option>
               </select>
             </div>
             <div class="group">
@@ -216,11 +212,11 @@
             </div>
             <div class="group">
               <label>เกณฑ์ p-hat (≥)</label>
-              <input type="number" id="thr" value="0.52" min="0.50" max="0.65" step="0.01" />
+              <input type="number" id="thr" value="0.53" min="0.50" max="0.65" step="0.01" />
             </div>
             <div class="group">
-              <label>กันปิงปอง (สลับ ≥)</label>
-              <input type="number" id="antiPing" value="4" min="3" max="8" />
+              <label>กันปิงปอง (สลับ ≥) — 0=ปิด</label>
+              <input type="number" id="antiPing" value="5" min="0" max="50" />
             </div>
             <div class="group switch">
               <label for="skipAfterTie">Skip หลัง Tie 1 ไม้</label>
@@ -228,7 +224,7 @@
             </div>
             <div class="group switch">
               <label for="useEMA">ใช้ EMA Window</label>
-              <input id="useEMA" type="checkbox" />
+              <input id="useEMA" type="checkbox" checked />
             </div>
             <div class="group">
               <label>EMA α (0.10–0.60)</label>
@@ -260,7 +256,7 @@
           </div>
 
           <div class="title">
-            <strong>ตั้งค่ารอบ “3/4 กิน 1”</strong>
+            <strong>ตั้งค่ารอบ “3/4/5 กิน 1”</strong>
             <span class="hint">HIT → พัก | MISS → ลองต่อ</span>
           </div>
 
@@ -269,8 +265,8 @@
               <label>Cycle Max Tries (N)</label>
               <select id="cycleMax">
                 <option value="3">3 (3 กิน 1)</option>
-                <option value="4" selected>4 (4 กิน 1)</option>
-                <option value="5">5</option>
+                <option value="4">4 (4 กิน 1)</option>
+                <option value="5" selected>5 (5 กิน 1)</option>
               </select>
             </div>
             <div class="group">
@@ -299,48 +295,27 @@
 
 <script>
 (function(){
-  /* ------------- Storage helpers (local -> session -> URL hash) ------------- */
-  const STORAGE_KEY = 'bh-state-v1';
-  function storageAvailable(type){
-    try{ const s=window[type]; const x='__t__'; s.setItem(x,x); s.removeItem(x); return true; }catch(e){ return false; }
-  }
-  const CAN_LOCAL = storageAvailable('localStorage');
-  const CAN_SESS  = storageAvailable('sessionStorage');
+  /* ------------ Storage helpers ------------ */
+  const STORAGE_KEY = 'bh-state-v1-conservative';
+  const CAN_LOCAL = (()=>{ try{localStorage.setItem('_t','1');localStorage.removeItem('_t');return true;}catch(e){return false;} })();
+  function saveAll(str){ try{ if(CAN_LOCAL) localStorage.setItem(STORAGE_KEY,str);}catch(e){} }
+  function readAll(){ try{ if(CAN_LOCAL) return localStorage.getItem(STORAGE_KEY)||null; }catch(e){} return null; }
 
-  function writeStore(str){
-    try{ if(CAN_LOCAL){ localStorage.setItem(STORAGE_KEY,str); return true; } }catch(e){}
-    try{ if(CAN_SESS){ sessionStorage.setItem(STORAGE_KEY,str); return true; } }catch(e){}
-    try{
-      const enc=encodeURIComponent(str), base=location.href.split('#')[0];
-      history.replaceState(null,'', base + '#state=' + enc);
-      return true;
-    }catch(e){ return false; }
-  }
-  function readStore(){
-    try{ if(CAN_LOCAL){ const s=localStorage.getItem(STORAGE_KEY); if(s) return s; } }catch(e){}
-    try{ if(CAN_SESS){ const s=sessionStorage.getItem(STORAGE_KEY); if(s) return s; } }catch(e){}
-    const m = location.hash.match(/#state=([^&]+)/); if(m){ try{ return decodeURIComponent(m[1]); }catch(e){} }
-    return null;
-  }
-  function clearStore(){
-    try{ if(CAN_LOCAL) localStorage.removeItem(STORAGE_KEY); }catch(e){}
-    try{ if(CAN_SESS)  sessionStorage.removeItem(STORAGE_KEY); }catch(e){}
-    try{ history.replaceState(null,'', location.href.split('#')[0]); }catch(e){}
-  }
-
-  /* -------------------- App State -------------------- */
+  /* -------------------- State -------------------- */
   const state = {
     seq: [],
-    cycle: { active:false, max:4, tries:0, pauseRemain:0,
-             pendingSignal:null, pendingIndex:-1, lastSuggested:'–' },
-    cycleStats: { hitsAt:{1:0,2:0,3:0,4:0,5:0}, fail:0, total:0 }
+    cycle: {
+      active:false, max:5, tries:0, pauseRemain:0,
+      pendingSignal:null, pendingIndex:-1, lastSuggested:'–',
+      justUnpaused:false          // flag ไม้แรกหลังพ้นช่วงพัก
+    },
+    cycleStats: { hitsAt:{}, fail:0, total:0 }   // คีย์เป็นสตริง '1'..'5'
   };
 
-  // Shortcuts to DOM
+  /* -------------------- DOM -------------------- */
   const $ = id => document.getElementById(id);
   const el = {
-    hudBadge: $('hudBadge'), reason: $('reason'),
-    tbBadge:$('tbBadge'),
+    hudBadge:$('hudBadge'), reason:$('reason'), tbBadge:$('tbBadge'),
     timeline:$('timeline'), stN:$('stN'), stB:$('stB'), stP:$('stP'), stT:$('stT'),
     btnB:$('btnB'), btnP:$('btnP'), btnT:$('btnT'), btnUndo:$('btnUndo'), btnReset:$('btnReset'),
     entryMode:$('entryMode'), winN:$('winN'), thr:$('thr'), antiPing:$('antiPing'),
@@ -351,8 +326,8 @@
     chipHitRate:$('chipHitRate'), chipTotals:$('chipTotals'),
     cyStatus:$('cyStatus'), cyDetail:$('cyDetail'), cyLast:$('cyLast'),
     h1Num:$('h1Num'), h2Num:$('h2Num'), h3Num:$('h3Num'), h4Num:$('h4Num'), h5Num:$('h5Num'), failNum:$('failNum'),
-    uiScale: $('uiScale'), uiScaleHint: $('uiScaleHint'),
-    settingsSection: $('settingsSection'), btnColSettings: $('btnColSettings')
+    uiScale:$('uiScale'), uiScaleHint:$('uiScaleHint'),
+    settingsSection:$('settingsSection'), btnColSettings:$('btnColSettings'),
   };
 
   /* -------------------- Helpers -------------------- */
@@ -370,12 +345,6 @@
     const z = Math.min(Math.max(parseFloat(v)||1, 0.8), 1.3);
     document.documentElement.style.setProperty('--zoom', z);
     if (el.uiScaleHint) el.uiScaleHint.textContent = Math.round(z*100)+'%';
-  }
-  function setCollapsed(sectionEl, btnEl, collapsed){
-    if(!sectionEl || !btnEl) return;
-    sectionEl.classList.toggle('is-collapsed', !!collapsed);
-    btnEl.textContent = collapsed ? 'ขยาย' : 'ย่อ';
-    btnEl.setAttribute('aria-expanded', (!collapsed).toString());
   }
 
   /* -------------------- Save / Restore -------------------- */
@@ -395,15 +364,15 @@
       }
     });
   }
-  function saveAll(){ writeStore(serializeAll()); }
+  function saveState(){ saveAll(serializeAll()); }
   function restoreAll(){
-    const raw = readStore(); if(!raw) return;
+    const raw = readAll(); if(!raw) return;
     try{
       const data = JSON.parse(raw), s=data.settings||{};
       if (s.entryMode) el.entryMode.value = s.entryMode;
       if (s.winN) el.winN.value = s.winN;
       if (s.thr) el.thr.value = s.thr;
-      if (s.antiPing) el.antiPing.value = s.antiPing;
+      if (s.antiPing!=null) el.antiPing.value = s.antiPing;
       if ('skipAfterTie' in s) el.skipAfterTie.checked = !!s.skipAfterTie;
       if ('useEMA' in s) el.useEMA.checked = !!s.useEMA;
       if (s.emaAlpha) el.emaAlpha.value = s.emaAlpha;
@@ -412,16 +381,16 @@
       if ('tieNoCount' in s) el.tieNoCount.checked = !!s.tieNoCount;
       if (s.zoom) applyZoom(s.zoom); else applyZoom(1);
       if (s.collapsed && typeof s.collapsed.settings === 'boolean'){
-        setCollapsed(el.settingsSection, el.btnColSettings, s.collapsed.settings);
+        const collapsed = s.collapsed.settings;
+        el.settingsSection.classList.toggle('is-collapsed', collapsed);
+        el.btnColSettings.textContent = collapsed ? 'ขยาย' : 'ย่อ';
+        el.btnColSettings.setAttribute('aria-expanded', (!collapsed).toString());
       }
-      const seq = Array.isArray(data.seq) ? data.seq : [];
-      if (seq.length) replayAll(seq);
-      if (data.cycleStats) { state.cycleStats = data.cycleStats; renderCycleSummary(); }
+      if (data.cycleStats) state.cycleStats = data.cycleStats;
+      if (Array.isArray(data.seq) && data.seq.length) replayAll(data.seq);
+      renderCycleSummary();
     }catch(e){ console.warn('Restore failed:', e); }
   }
-  document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState!=='visible') saveAll(); });
-  window.addEventListener('pagehide', saveAll);
-  setInterval(saveAll, 2000);
 
   /* -------------------- Renderers -------------------- */
   function renderTimeline(){
@@ -436,12 +405,9 @@
   }
   function setHUD(kind,text){
     el.reason.textContent=text||'';
-    if(kind==='PLAY_B'){ el.hudBadge.className='hud-pill playB'; el.hudBadge.textContent='PLAY B';
-                         el.tbBadge.className='h-callout playB'; el.tbBadge.textContent='PLAY B'; }
-    else if(kind==='PLAY_P'){ el.hudBadge.className='hud-pill playP'; el.hudBadge.textContent='PLAY P';
-                              el.tbBadge.className='h-callout playP'; el.tbBadge.textContent='PLAY P'; }
-    else{ el.hudBadge.className='hud-pill skip'; el.hudBadge.textContent='SKIP';
-          el.tbBadge.className='h-callout skip'; el.tbBadge.textContent='SKIP'; }
+    if(kind==='PLAY_B'){ el.hudBadge.className='hud-pill playB'; el.hudBadge.textContent='PLAY B'; el.tbBadge.className='h-callout playB'; el.tbBadge.textContent='PLAY B'; }
+    else if(kind==='PLAY_P'){ el.hudBadge.className='hud-pill playP'; el.hudBadge.textContent='PLAY P'; el.tbBadge.className='h-callout playP'; el.tbBadge.textContent='PLAY P'; }
+    else{ el.hudBadge.className='hud-pill skip'; el.hudBadge.textContent='SKIP'; el.tbBadge.className='h-callout skip'; el.tbBadge.textContent='SKIP'; }
   }
   function setCycle(status, detail, last){
     el.chipStatus.textContent = `Cycle: ${status}`;
@@ -452,84 +418,123 @@
     el.cyLast.textContent = `Last Suggested: ${last||'–'}`;
   }
   function renderCycleSummary(){
-    const H=state.cycleStats.hitsAt, total=state.cycleStats.total, fail=state.cycleStats.fail;
-    const vals = [H[1]||0,H[2]||0,H[3]||0,H[4]||0,H[5]||0,fail||0];
-    const hitSum = vals.slice(0,5).reduce((a,b)=>a+b,0);
+    const H = state.cycleStats.hitsAt || {};
+    const total = Number(state.cycleStats.total || 0);
+    const fail  = Number(state.cycleStats.fail  || 0);
+    const h1 = Number(H['1'] ?? H[1] ?? 0);
+    const h2 = Number(H['2'] ?? H[2] ?? 0);
+    const h3 = Number(H['3'] ?? H[3] ?? 0);
+    const h4 = Number(H['4'] ?? H[4] ?? 0);
+    const h5 = Number(H['5'] ?? H[5] ?? 0);
+    const hitSum = h1+h2+h3+h4+h5;
     const rate = total ? (100*hitSum/total).toFixed(1) : '0.0';
+
     el.chipHitRate.textContent = `HIT Rate: ${rate}%`;
-    el.chipTotals.textContent = `Rounds: ${total} | HIT: ${hitSum} | FAIL: ${fail}`;
-    el.h1Num.textContent = vals[0]; el.h2Num.textContent = vals[1]; el.h3Num.textContent = vals[2];
-    el.h4Num.textContent = vals[3]; el.h5Num.textContent = vals[4]; el.failNum.textContent = vals[5];
+    el.chipTotals.textContent  = `Rounds: ${total} | HIT: ${hitSum} | FAIL: ${fail}`;
+    el.h1Num.textContent=String(h1); el.h2Num.textContent=String(h2);
+    el.h3Num.textContent=String(h3); el.h4Num.textContent=String(h4);
+    el.h5Num.textContent=String(h5); el.failNum.textContent=String(fail);
   }
 
-  /* -------------------- Decision (No-Lock + Cycle) -------------------- */
+  /* -------------------- Decision (ลอจิกเดิม + Try-aware CONSERVATIVE) -------------------- */
   function decide(){
     const N = clamp(el.winN.value,3,30);
-    const thr = Math.min(Math.max(parseFloat(el.thr.value||'0.52'),0.5),0.75);
-    const antiPingLen = clamp(el.antiPing.value,3,8);
+    const thr = Math.min(Math.max(parseFloat(el.thr.value||'0.53'),0.5),0.75);
     const useEMA = el.useEMA.checked;
     const alpha = Math.min(Math.max(parseFloat(el.emaAlpha.value||'0.30'),0.10),0.60);
     const mode = el.entryMode.value;
-    state.cycle.max = parseInt(el.cycleMax.value,10);
-    const pauseCfg = clamp(el.pauseHands.value,0,10);
-    el.pauseHands.value = String(pauseCfg);
 
+    state.cycle.max = parseInt(el.cycleMax.value||5,10);
+    el.pauseHands.value = String(clamp(el.pauseHands.value,0,10));
+
+    // ----- Try-aware parameters (Conservative: เข้มปลายรอบ) -----
+    const tryIndex = state.cycle.active ? (state.cycle.tries + 1) : 1;  // 1..max
+    const maxTries = state.cycle.max || 1;
+
+    const tightenSlope = 0.008; // +0.8% ต่อ “ขั้นเข้ม”
+    const lateStart = Math.ceil(maxTries * 0.6);         // เริ่มเข้ม ~60% ของรอบ (เช่น 3/5)
+    const veryLateStart = Math.max(maxTries - 1, 2);     // เข้มมากช่วงไม้รองสุดท้าย/สุดท้าย
+
+    let stage = 0;
+    if (tryIndex >= veryLateStart) stage = 2;  // เข้มมาก
+    else if (tryIndex >= lateStart) stage = 1; // เข้มกลาง
+
+    let thrEff = thr + tightenSlope * stage;
+    // กรอบความปลอดภัย: สูงสุด +0.03, ต่ำสุด -0.005
+    thrEff = Math.min(thr + 0.03, Math.max(thr - 0.005, thrEff));
+
+    // ไม้แรกหลังพัก: เข้มขึ้นเล็กน้อย (กันรีบเข้าหลังชนะ)
+    if (state.cycle.justUnpaused) {
+      thrEff = Math.min(0.75, thrEff + 0.005);
+      state.cycle.justUnpaused = false;
+    }
+
+    // Anti-ping policy (Conservative): ปลายรอบ "เข้มขึ้น"
+    const antiPingLenRaw = clamp(el.antiPing.value, 0, 50); // 0 = ผู้ใช้ปิดเอง
+    let antiPingLen = antiPingLenRaw;
+    if (antiPingLenRaw > 0) {
+      if (tryIndex >= veryLateStart) {
+        antiPingLen = Math.max(0, antiPingLenRaw - 2); // ให้ติดง่ายขึ้นในไม้ท้าย
+      } else if (tryIndex >= lateStart) {
+        antiPingLen = Math.max(0, antiPingLenRaw - 1);
+      }
+    }
+
+    // ----- Early returns & info -----
     if(state.cycle.pauseRemain>0){
       setHUD('SKIP',`พักหลัง HIT • เหลือ ${state.cycle.pauseRemain} ไม้`);
       setCycle('PAUSE',`พัก ${state.cycle.pauseRemain} ไม้`,state.cycle.lastSuggested);
       renderCycleSummary();
       el.altLen.textContent = String(alternationLen(state.seq));
-      el.winCount.textContent = '0';
-      el.pHatB.textContent = '–';
-      el.pHatP.textContent = '–';
+      el.winCount.textContent = '0'; el.pHatB.textContent = '–'; el.pHatP.textContent = '–';
       return;
     }
 
     const seq=state.seq; const last=seq[seq.length-1];
     if(el.skipAfterTie.checked && last==='T'){
       setHUD('SKIP','เพิ่งออก Tie ➜ ข้าม 1 ไม้');
-      setCycle(state.cycle.active?'ACTIVE':'IDLE', state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน', state.cycle.lastSuggested);
+      setCycle(state.cycle.active?'ACTIVE':'IDLE',
+               state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน',
+               state.cycle.lastSuggested);
       renderCycleSummary();
       el.altLen.textContent = String(alternationLen(state.seq));
-      el.winCount.textContent = '0';
-      el.pHatB.textContent = '–';
-      el.pHatP.textContent = '–';
+      el.winCount.textContent = '0'; el.pHatB.textContent = '–'; el.pHatP.textContent = '–';
       return;
     }
 
     const altL = alternationLen(seq);
-    const antiPingActive = altL >= antiPingLen;
+    const antiPingActive = (antiPingLen > 0) && (altL >= antiPingLen);
+
     const r = useEMA ? laplaceFromEMA(seq,alpha) : laplaceFromWindow(lastWindowBP(seq,N));
     const {pB,pP,Np} = r;
 
     el.altLen.textContent = String(altL);
-    if (Np === 0) {
-      el.winCount.textContent = '0';
-      el.pHatB.textContent = '–';
-      el.pHatP.textContent = '–';
-    } else {
-      el.winCount.textContent = String(Np);
-      el.pHatB.textContent = pB.toFixed(3);
-      el.pHatP.textContent = pP.toFixed(3);
-    }
+    if (Np === 0) { el.winCount.textContent = '0'; el.pHatB.textContent = '–'; el.pHatP.textContent = '–'; }
+    else { el.winCount.textContent = String(Np); el.pHatB.textContent = pB.toFixed(3); el.pHatP.textContent = pP.toFixed(3); }
 
     if(Np===0){
       setHUD('SKIP','ยังไม่มีข้อมูล B/P เพียงพอ');
-      setCycle(state.cycle.active?'ACTIVE':'IDLE', state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน', state.cycle.lastSuggested);
+      setCycle(state.cycle.active?'ACTIVE':'IDLE',
+               state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน',
+               state.cycle.lastSuggested);
       renderCycleSummary(); return;
     }
     if(antiPingActive){
-      setHUD('SKIP',`กันปิงปอง: สลับยาว ${altL} ไม้`);
-      setCycle(state.cycle.active?'ACTIVE':'IDLE', state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน', state.cycle.lastSuggested);
+      setHUD('SKIP',`กันปิงปอง: สลับยาว ${altL} ไม้ (Try ${tryIndex}/${maxTries})`);
+      setCycle(state.cycle.active?'ACTIVE':'IDLE',
+               state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน',
+               state.cycle.lastSuggested);
       renderCycleSummary(); return;
     }
 
-    const passB = pB>=thr, passP = pP>=thr;
+    // ----- Decision with thrEff -----
+    const passB = pB>=thrEff, passP = pP>=thrEff;
     let suggested=null, txt='';
-    if(mode==='BONLY'){ if(passB){ suggested='B'; txt=`p-hat_B = ${pB.toFixed(3)} ≥ ${thr.toFixed(2)} ➜ แทง B`; } }
-    else{
-      if(passB && (!passP || pB>=pP)){ suggested='B'; txt=`p-hat_B = ${pB.toFixed(3)} ≥ ${thr.toFixed(2)} ➜ แทง B`; }
-      else if(passP && (!passB || pP>pB)){ suggested='P'; txt=`p-hat_P = ${pP.toFixed(3)} ≥ ${thr.toFixed(2)} ➜ แทง P`; }
+    if(mode==='BONLY'){
+      if(passB){ suggested='B'; txt=`p-hat_B = ${pB.toFixed(3)} ≥ ${thrEff.toFixed(2)} (Try ${tryIndex}/${maxTries})`; }
+    }else{
+      if(passB && (!passP || pB>=pP)){ suggested='B'; txt=`p-hat_B = ${pB.toFixed(3)} ≥ ${thrEff.toFixed(2)} (Try ${tryIndex}/${maxTries})`; }
+      else if(passP && (!passB || pP>pB)){ suggested='P'; txt=`p-hat_P = ${pP.toFixed(3)} ≥ ${thrEff.toFixed(2)} (Try ${tryIndex}/${maxTries})`; }
     }
 
     if(suggested){
@@ -538,40 +543,48 @@
       if(!state.cycle.active){ state.cycle.active=true; state.cycle.tries=0; }
       setCycle('ACTIVE',`Try ${state.cycle.tries+1}/${state.cycle.max}`,state.cycle.lastSuggested);
     }else{
-      setHUD('SKIP',`p-hat_B=${pB.toFixed(3)}, p-hat_P=${pP.toFixed(3)} (thr=${thr.toFixed(2)})`);
-      setCycle(state.cycle.active?'ACTIVE':'IDLE', state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน', state.cycle.lastSuggested);
+      setHUD('SKIP',`pB=${pB.toFixed(3)}, pP=${pP.toFixed(3)}, thr*=${thrEff.toFixed(2)} (Try ${tryIndex}/${maxTries})`);
+      setCycle(state.cycle.active?'ACTIVE':'IDLE',
+               state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน',
+               state.cycle.lastSuggested);
     }
     renderCycleSummary();
   }
 
   /* -------------------- Cycle judgement & stats -------------------- */
   function hitAndPause(){
-    const tryIndex = (state.cycle.tries||0) + 1;
-    const k = Math.min(5, tryIndex);
-    state.cycleStats.hitsAt[k] = (state.cycleStats.hitsAt[k]||0) + 1;
-    state.cycleStats.total += 1;
-    renderCycleSummary();
-
+    const kKey = String(Math.min(5, (state.cycle.tries||0) + 1));
+    state.cycleStats.hitsAt[kKey] = Number(state.cycleStats.hitsAt[kKey] || 0) + 1;
+    state.cycleStats.total = Number(state.cycleStats.total || 0) + 1;
     const pause=clamp(el.pauseHands.value,0,10);
     state.cycle.active=false; state.cycle.tries=0; state.cycle.pauseRemain=pause;
     setCycle('HIT',`พัก ${pause} ไม้`, state.cycle.lastSuggested);
+    renderCycleSummary(); saveState();
   }
   function missOrFail(){
     const Nmax=state.cycle.max; if(!state.cycle.active) return;
     if(state.cycle.tries+1>=Nmax){
       state.cycle.active=false; state.cycle.tries=0;
-      state.cycleStats.fail += 1; state.cycleStats.total += 1;
-      renderCycleSummary();
+      state.cycleStats.fail = Number(state.cycleStats.fail || 0) + 1;
+      state.cycleStats.total = Number(state.cycleStats.total || 0) + 1;
       setCycle('FAIL','ครบ Max Tries แล้วยังไม่ HIT', state.cycle.lastSuggested);
+      renderCycleSummary(); saveState();
     }else{
       state.cycle.tries+=1;
       setCycle('ACTIVE',`Try ${state.cycle.tries+1}/${state.cycle.max}`, state.cycle.lastSuggested);
+      renderCycleSummary();
     }
   }
 
   /* -------------------- Undo / Replay -------------------- */
-  function resetCycle(){ return { active:false, max: parseInt(el.cycleMax.value,10), tries:0, pauseRemain:0, pendingSignal:null, pendingIndex:-1, lastSuggested:'–' }; }
-  function resetCycleStats(){ state.cycleStats = { hitsAt:{1:0,2:0,3:0,4:0,5:0}, fail:0, total:0 }; renderCycleSummary(); }
+  function resetCycle(){
+    return {
+      active:false, max: parseInt(el.cycleMax.value,10), tries:0, pauseRemain:0,
+      pendingSignal:null, pendingIndex:-1, lastSuggested:'–',
+      justUnpaused:false
+    };
+  }
+  function resetCycleStats(){ state.cycleStats = { hitsAt:{}, fail:0, total:0 }; renderCycleSummary(); }
   function replayAll(seq){
     state.seq = []; state.cycle = resetCycle(); resetCycleStats();
     renderTimeline(); statsAll();
@@ -582,39 +595,42 @@
   }
 
   /* -------------------- Events -------------------- */
-  function push(ch){ state.seq.push(ch); renderTimeline(); statsAll(); afterRecord(ch); decide(); saveAll(); }
+  function push(ch){ state.seq.push(ch); renderTimeline(); statsAll(); afterRecord(ch); decide(); saveState(); }
   function afterRecord(outcome){
-    if(state.cycle.pauseRemain>0){ state.cycle.pauseRemain--; return; }
+    // ลดตัวนับพัก และตั้งธงเมื่อพ้นช่วงพัก
+    if(state.cycle.pauseRemain>0){
+      state.cycle.pauseRemain--;
+      if (state.cycle.pauseRemain === 0) state.cycle.justUnpaused = true;
+      return;
+    }
+    // ตัดสินผลของสัญญาณล่าสุด
     if(state.cycle.pendingSignal!=null && state.cycle.pendingIndex===state.seq.length-1){
       const side=state.cycle.pendingSignal; state.cycle.pendingSignal=null; state.cycle.pendingIndex=-1;
-      if(outcome==='T'){ if(el.tieNoCount.checked){return;} else {missOrFail(); saveAll(); return;} }
+      if(outcome==='T'){ if(el.tieNoCount.checked){return;} else {missOrFail(); saveState(); return;} }
       if(outcome===side) hitAndPause(); else missOrFail();
-      saveAll();
+      saveState();
     }
   }
 
-  // ปุ่มกดหลัก
+  // Buttons
   el.btnB.onclick=()=>push('B'); el.btnP.onclick=()=>push('P'); el.btnT.onclick=()=>push('T');
-  el.btnUndo.onclick=()=>{ if(state.seq.length===0) return; replayAll(state.seq.slice(0,-1)); saveAll(); };
-  el.btnReset.onclick=()=>{ if(confirm('ล้างข้อมูลทั้งหมดและรีเซ็ตสถานะใช่ไหม?')){ state.seq=[]; state.cycle=resetCycle(); resetCycleStats(); renderTimeline(); statsAll(); decide(); clearStore(); } };
+  el.btnUndo.onclick=()=>{ if(state.seq.length===0) return; replayAll(state.seq.slice(0,-1)); saveState(); };
+  el.btnReset.onclick=()=>{ if(confirm('ล้างข้อมูลทั้งหมดและรีเซ็ตสถานะใช่ไหม?')){ state.seq=[]; state.cycle=resetCycle(); resetCycleStats(); renderTimeline(); statsAll(); decide(); saveState(); } };
 
   // Inputs → recalc + save
   ['entryMode','winN','thr','antiPing','skipAfterTie','useEMA','emaAlpha','cycleMax','tieNoCount']
     .forEach(id=>{
-      $(id).addEventListener('input', ()=>{ decide(); saveAll(); });
-      $(id).addEventListener('change', ()=>{ decide(); saveAll(); });
+      $(id).addEventListener('input', ()=>{ decide(); saveState(); });
+      $(id).addEventListener('change', ()=>{ decide(); saveState(); });
     });
 
-  // Pause (type="tel") ให้รับ 0–10 เท่านั้น
-  el.pauseHands.addEventListener('input', ()=>{
-    const digits = (el.pauseHands.value||'').replace(/[^\d]/g,'').slice(0,2);
-    el.pauseHands.value = digits;
-  });
-  el.pauseHands.addEventListener('change', ()=>{ el.pauseHands.value = String(clamp(el.pauseHands.value,0,10)); decide(); saveAll(); });
+  // Pause guard
+  el.pauseHands.addEventListener('input', ()=>{ el.pauseHands.value=(el.pauseHands.value||'').replace(/[^\d]/g,'').slice(0,2); });
+  el.pauseHands.addEventListener('change', ()=>{ el.pauseHands.value=String(clamp(el.pauseHands.value,0,10)); decide(); saveState(); });
 
-  // UI scale slider
+  // UI scale
   if (el.uiScale){
-    el.uiScale.addEventListener('input', ()=>{ applyZoom(el.uiScale.value); saveAll(); });
+    el.uiScale.addEventListener('input', ()=>{ applyZoom(el.uiScale.value); saveState(); });
     applyZoom(1);
   }
 
@@ -622,27 +638,17 @@
   if (el.btnColSettings){
     el.btnColSettings.addEventListener('click', ()=>{
       const next = !el.settingsSection.classList.contains('is-collapsed');
-      setCollapsed(el.settingsSection, el.btnColSettings, next); saveAll();
+      el.settingsSection.classList.toggle('is-collapsed', next);
+      el.btnColSettings.textContent = next ? 'ขยาย' : 'ย่อ';
+      el.btnColSettings.setAttribute('aria-expanded', (!next).toString());
+      saveState();
     });
   }
 
-  // คีย์ลัดคีย์บอร์ด (B/P/T/U/R)
-  document.addEventListener('keydown', (e) => {
-    const tag = document.activeElement?.tagName?.toLowerCase?.();
-    if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.metaKey || e.ctrlKey || e.altKey) return;
-    const k = e.key?.toLowerCase?.();
-    if (!k) return;
-    if (k === 'b') el.btnB.click();
-    else if (k === 'p') el.btnP.click();
-    else if (k === 't') el.btnT.click();
-    else if (k === 'u') el.btnUndo.click();
-    else if (k === 'r') el.btnReset.click();
-  });
-
   /* -------------------- Init -------------------- */
-  renderTimeline(); statsAll(); renderCycleSummary();
-  restoreAll(); 
-  decide();
+  function saveState(){ saveAll(serializeAll()); }
+  function renderInit(){ renderTimeline(); statsAll(); renderCycleSummary(); decide(); }
+  renderInit(); restoreAll();
 })();
 </script>
 </body>
