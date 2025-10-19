@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Baccarat Helper — Conservative Stable</title>
+<title>Baccarat Helper — Modern Glass • Conservative-Strict + EMA Fixed</title>
 <style>
   :root{
     --bg:#060a16; --grad1:#0b1430; --grad2:#0a1026;
@@ -11,7 +11,8 @@
     --muted:#9fb0d6; --text:#eef3ff; --shadow:0 14px 36px rgba(0,0,0,.45);
     --radius:18px;
     --b:#e74c3c; --p:#2e86de; --t:#2ecc71;
-    --zoom:1;
+    --ok:#25c06d; --warn:#ffb020; --bad:#ff5d6c;
+    --zoom: 1;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -29,6 +30,7 @@
     width: calc(100% / var(--zoom));
   }
   @media (pointer: coarse){ body{ transform:none; width:auto; } }
+  button, input, select { touch-action: manipulation; }
 
   /* Header */
   .header{
@@ -45,10 +47,14 @@
   .h-callout.playP{background:rgba(46,134,222,.25); border-color:rgba(46,134,222,.5)}
   .h-callout.skip{ background:rgba(255,93,108,.22); border-color:rgba(255,93,108,.45)}
 
+  /* Layout */
   .wrap{max-width:1200px; margin:0 auto; display:grid; gap:14px}
   .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:14px; align-items:start}
   @media (max-width:980px){ .grid{grid-template-columns:1fr} }
-  .card{background:linear-gradient(180deg, var(--glass), transparent); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px}
+  .card{
+    background:linear-gradient(180deg, var(--glass), transparent);
+    border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px
+  }
   .title{display:flex; align-items:center; gap:8px; justify-content:space-between; margin-bottom:8px}
   .hint{font-size:12px; color:#9fb0d6}
   .sticky{position:sticky; top:92px; align-self:start}
@@ -68,7 +74,10 @@
   .reason{color:#c7d3ff; font-size:14px}
 
   /* Quick summary */
-  .cycle-quick{display:grid; gap:10px; background:#0f1536cc; border:1px solid var(--border); border-radius:14px; padding:10px 12px}
+  .cycle-quick{
+    display:grid; gap:10px;
+    background:#0f1536cc; border:1px solid var(--border); border-radius:14px; padding:10px 12px;
+  }
   .chips{display:flex; gap:8px; flex-wrap:wrap}
   .chip{background:#0d1533; border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-weight:800; color:#cfe1ff; font-size:13px}
 
@@ -83,7 +92,7 @@
   .dot{width:16px; height:16px; border-radius:50%; box-shadow:inset 0 -2px 0 rgba(0,0,0,.25)}
   .dot.b{background:var(--b)} .dot.p{background:var(--p)} .dot.t{background:var(--t)}
 
-  /* Inline Stats */
+  /* Inline Stats: B P T + Total */
   .inline-stats{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin-top:8px; }
   .stat-pill{ display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#eaf1ff; }
   .stat-pill .ball{
@@ -91,12 +100,12 @@
     display:inline-flex; align-items:center; justify-content:center;
     color:#fff; font-weight:900; font-size:12px; box-shadow:inset 0 -2px 0 rgba(0,0,0,.25);
   }
-  .ball.b{ background:var(--b);} .ball.p{ background:var(--p);} .ball.t{ background:var(--t);}
+  .ball.b{ background:var(--b); } .ball.p{ background:var(--p); } .ball.t{ background:var(--t); }
   .stat-count{ font-size:18px; }
   .stat-total{ margin-left:4px; font-size:18px; font-weight:900; }
   .stat-total span{ margin-left:6px; }
 
-  /* Hit Columns */
+  /* Hit Columns (ไม้1..ไม้5 + FAIL) */
   .hitlist{ display:grid; grid-template-columns: repeat(6, minmax(72px,1fr)); gap:10px; margin-top:6px; }
   .hit-col{ text-align:center; padding:6px 4px 10px; border-bottom:2px dashed var(--border); border-radius:4px; }
   .hit-col.ok{ border-color:rgba(46,204,113,.55); }
@@ -128,7 +137,7 @@
 <body>
   <!-- Header -->
   <div class="header">
-    <div class="brand">🂡 Baccarat Helper <span class="badge">Conservative Stable</span></div>
+    <div class="brand">🂡 Baccarat Helper <span class="badge">Modern Glass • Conservative-Strict</span></div>
     <div class="spacer"></div>
     <span id="tbBadge" class="h-callout skip">SKIP</span>
   </div>
@@ -193,7 +202,7 @@
       <section class="card sticky collapsible" id="settingsSection">
         <div class="title">
           <strong>ตัวกรอง & เงื่อนไขเข้า</strong>
-          <div class="hint">ลอจิกเดิม • โหมด Conservative (ปลายรอบเข้มขึ้น)</div>
+          <div class="hint">ลอจิกเดิม • Conservative-Strict (ปลายรอบเข้มขึ้น)</div>
           <button class="collapse-btn" id="btnColSettings" aria-expanded="true">ย่อ</button>
         </div>
 
@@ -295,8 +304,22 @@
 
 <script>
 (function(){
+  /* ===== STRICT CONFIG (ไม่มี UI) ===== */
+  const STRICT = {
+    tightenSlope: 0.010,   // +1.0% ต่อขั้นเข้ม (ปลายรอบ)
+    lateFrac: 0.50,        // เริ่มเข้มเมื่อ ≥50% ของรอบ
+    maxBoost: +0.035,      // ดัน thr ได้สูงสุด +3.5%
+    minDip:   0.000,       // ไม่ผ่อนลงต่ำกว่า thr เดิม
+    dominanceDelta: 0.020, // ต้องนำอีกฝั่ง ≥2.0% (Two-Sided)
+    minNp: 6,              // หลักฐานขั้นต่ำเมื่อใช้ Window
+    minNpEMA: 4,           // หลักฐานขั้นต่ำเมื่อใช้ EMA (ใช้ Neff)
+    extraAfterMiss: 0.005, // พลาดไม้ก่อนหน้า → เข้มเพิ่ม 0.5%
+    altBuffLate: 2,        // ปลายรอบ: ลดเกณฑ์สลับลง 2 (anti-ping ติดง่ายขึ้น)
+    altBuffVeryLate: 3     // ท้ายสุด: ลดลง 3
+  };
+
   /* ------------ Storage helpers ------------ */
-  const STORAGE_KEY = 'bh-state-v1-conservative';
+  const STORAGE_KEY = 'bh-state-v1-modern-glass-strict';
   const CAN_LOCAL = (()=>{ try{localStorage.setItem('_t','1');localStorage.removeItem('_t');return true;}catch(e){return false;} })();
   function saveAll(str){ try{ if(CAN_LOCAL) localStorage.setItem(STORAGE_KEY,str);}catch(e){} }
   function readAll(){ try{ if(CAN_LOCAL) return localStorage.getItem(STORAGE_KEY)||null; }catch(e){} return null; }
@@ -307,9 +330,9 @@
     cycle: {
       active:false, max:5, tries:0, pauseRemain:0,
       pendingSignal:null, pendingIndex:-1, lastSuggested:'–',
-      justUnpaused:false          // flag ไม้แรกหลังพ้นช่วงพัก
+      justUnpaused:false, missedLast:false
     },
-    cycleStats: { hitsAt:{}, fail:0, total:0 }   // คีย์เป็นสตริง '1'..'5'
+    cycleStats: { hitsAt:{}, fail:0, total:0 }
   };
 
   /* -------------------- DOM -------------------- */
@@ -336,11 +359,19 @@
   function alternationLen(s){ const bp=bpOnly(s); if(bp.length<=1) return 0; let len=1; for(let i=bp.length-1;i>0;i--){ if(bp[i]!==bp[i-1]) len++; else break; } return len; }
   function lastWindowBP(s,N){ const bp=bpOnly(s); return bp.slice(Math.max(0,bp.length-N)); }
   function laplaceFromWindow(win){ const B=win.filter(x=>x==='B').length, P=win.length-B, Np=win.length; return { pB:(B+1)/(Np+2), pP:(P+1)/(Np+2), Np }; }
+
+  // === EMA Fixed: คืน Np (ดิบ), Neff (≈2/α) ===
   function laplaceFromEMA(seq,alpha){
-    const bp=bpOnly(seq); let accB=0,accP=0;
+    const bp=bpOnly(seq);
+    let accB=0,accP=0;
     bp.forEach(x=>{ accB=(1-alpha)*accB+(x==='B'?alpha:0); accP=(1-alpha)*accP+(x==='P'?alpha:0); });
-    const wB=accB,wP=accP,wT=wB+wP; return { pB:(wB+1)/(wT+2), pP:(wP+1)/(wT+2), Np:Math.round(wT) };
+    const wB=accB,wP=accP;
+    const pB=(wB+1)/(wB+wP+2), pP=(wP+1)/(wB+wP+2);
+    const Nraw=bp.length;
+    const Neff=Math.min(Nraw, Math.round(2/alpha)); // effective sample size
+    return { pB, pP, Np:Nraw, Neff };
   }
+
   function applyZoom(v){
     const z = Math.min(Math.max(parseFloat(v)||1, 0.8), 1.3);
     document.documentElement.style.setProperty('--zoom', z);
@@ -436,10 +467,10 @@
     el.h5Num.textContent=String(h5); el.failNum.textContent=String(fail);
   }
 
-  /* -------------------- Decision (ลอจิกเดิม + Try-aware CONSERVATIVE) -------------------- */
+  /* -------------------- DECIDE (ลอจิกเดิม + STRICT) -------------------- */
   function decide(){
     const N = clamp(el.winN.value,3,30);
-    const thr = Math.min(Math.max(parseFloat(el.thr.value||'0.53'),0.5),0.75);
+    const baseThr = Math.min(Math.max(parseFloat(el.thr.value||'0.53'),0.5),0.75);
     const useEMA = el.useEMA.checked;
     const alpha = Math.min(Math.max(parseFloat(el.emaAlpha.value||'0.30'),0.10),0.60);
     const mode = el.entryMode.value;
@@ -447,40 +478,27 @@
     state.cycle.max = parseInt(el.cycleMax.value||5,10);
     el.pauseHands.value = String(clamp(el.pauseHands.value,0,10));
 
-    // ----- Try-aware parameters (Conservative: เข้มปลายรอบ) -----
-    const tryIndex = state.cycle.active ? (state.cycle.tries + 1) : 1;  // 1..max
+    // ---- STRICT try-aware ----
+    const tryIndex = state.cycle.active ? (state.cycle.tries + 1) : 1;
     const maxTries = state.cycle.max || 1;
+    const lateStart     = Math.ceil(maxTries * STRICT.lateFrac);
+    const veryLateStart = Math.max(maxTries - 1, 2);
+    let stage = 0; if (tryIndex >= veryLateStart) stage = 2; else if (tryIndex >= lateStart) stage = 1;
 
-    const tightenSlope = 0.008; // +0.8% ต่อ “ขั้นเข้ม”
-    const lateStart = Math.ceil(maxTries * 0.6);         // เริ่มเข้ม ~60% ของรอบ (เช่น 3/5)
-    const veryLateStart = Math.max(maxTries - 1, 2);     // เข้มมากช่วงไม้รองสุดท้าย/สุดท้าย
+    let thrEff = baseThr + STRICT.tightenSlope * stage;
+    thrEff = Math.min(baseThr + STRICT.maxBoost, Math.max(baseThr - STRICT.minDip, thrEff));
+    if (state.cycle.missedLast) thrEff = Math.min(0.75, thrEff + STRICT.extraAfterMiss);
+    if (state.cycle.justUnpaused) { thrEff = Math.min(0.75, thrEff + 0.005); state.cycle.justUnpaused = false; }
 
-    let stage = 0;
-    if (tryIndex >= veryLateStart) stage = 2;  // เข้มมาก
-    else if (tryIndex >= lateStart) stage = 1; // เข้มกลาง
-
-    let thrEff = thr + tightenSlope * stage;
-    // กรอบความปลอดภัย: สูงสุด +0.03, ต่ำสุด -0.005
-    thrEff = Math.min(thr + 0.03, Math.max(thr - 0.005, thrEff));
-
-    // ไม้แรกหลังพัก: เข้มขึ้นเล็กน้อย (กันรีบเข้าหลังชนะ)
-    if (state.cycle.justUnpaused) {
-      thrEff = Math.min(0.75, thrEff + 0.005);
-      state.cycle.justUnpaused = false;
-    }
-
-    // Anti-ping policy (Conservative): ปลายรอบ "เข้มขึ้น"
-    const antiPingLenRaw = clamp(el.antiPing.value, 0, 50); // 0 = ผู้ใช้ปิดเอง
+    // Anti-ping เข้มปลายรอบ
+    const antiPingLenRaw = clamp(el.antiPing.value, 0, 50);
     let antiPingLen = antiPingLenRaw;
     if (antiPingLenRaw > 0) {
-      if (tryIndex >= veryLateStart) {
-        antiPingLen = Math.max(0, antiPingLenRaw - 2); // ให้ติดง่ายขึ้นในไม้ท้าย
-      } else if (tryIndex >= lateStart) {
-        antiPingLen = Math.max(0, antiPingLenRaw - 1);
-      }
+      if (tryIndex >= veryLateStart) antiPingLen = Math.max(0, antiPingLenRaw - STRICT.altBuffVeryLate);
+      else if (tryIndex >= lateStart) antiPingLen = Math.max(0, antiPingLenRaw - STRICT.altBuffLate);
     }
 
-    // ----- Early returns & info -----
+    // ---- Early guards ----
     if(state.cycle.pauseRemain>0){
       setHUD('SKIP',`พักหลัง HIT • เหลือ ${state.cycle.pauseRemain} ไม้`);
       setCycle('PAUSE',`พัก ${state.cycle.pauseRemain} ไม้`,state.cycle.lastSuggested);
@@ -503,22 +521,27 @@
     }
 
     const altL = alternationLen(seq);
-    const antiPingActive = (antiPingLen > 0) && (altL >= antiPingLen);
-
-    const r = useEMA ? laplaceFromEMA(seq,alpha) : laplaceFromWindow(lastWindowBP(seq,N));
-    const {pB,pP,Np} = r;
-
     el.altLen.textContent = String(altL);
-    if (Np === 0) { el.winCount.textContent = '0'; el.pHatB.textContent = '–'; el.pHatP.textContent = '–'; }
-    else { el.winCount.textContent = String(Np); el.pHatB.textContent = pB.toFixed(3); el.pHatP.textContent = pP.toFixed(3); }
 
-    if(Np===0){
-      setHUD('SKIP','ยังไม่มีข้อมูล B/P เพียงพอ');
+    // คำนวณ p-hat
+    const r = useEMA ? laplaceFromEMA(seq,alpha) : laplaceFromWindow(lastWindowBP(seq,N));
+    const {pB,pP} = r;
+    const evidence = useEMA ? (r.Neff || r.Np) : r.Np;
+    const minNeed = useEMA ? STRICT.minNpEMA : STRICT.minNp;
+
+    // แสดงผลด้านขวา
+    if (evidence === 0) { el.winCount.textContent='0'; el.pHatB.textContent='–'; el.pHatP.textContent='–'; }
+    else { el.winCount.textContent=String(evidence); el.pHatB.textContent=pB.toFixed(3); el.pHatP.textContent=pP.toFixed(3); }
+
+    if(evidence < minNeed){
+      setHUD('SKIP', `หลักฐานน้อย (N=${evidence}) ต้อง ≥ ${minNeed}`);
       setCycle(state.cycle.active?'ACTIVE':'IDLE',
                state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน',
                state.cycle.lastSuggested);
       renderCycleSummary(); return;
     }
+
+    const antiPingActive = (antiPingLen > 0) && (altL >= antiPingLen);
     if(antiPingActive){
       setHUD('SKIP',`กันปิงปอง: สลับยาว ${altL} ไม้ (Try ${tryIndex}/${maxTries})`);
       setCycle(state.cycle.active?'ACTIVE':'IDLE',
@@ -527,14 +550,26 @@
       renderCycleSummary(); return;
     }
 
-    // ----- Decision with thrEff -----
+    // ---- Decision with thrEff + dominance ----
     const passB = pB>=thrEff, passP = pP>=thrEff;
     let suggested=null, txt='';
-    if(mode==='BONLY'){
+    if(el.entryMode.value==='BONLY'){
       if(passB){ suggested='B'; txt=`p-hat_B = ${pB.toFixed(3)} ≥ ${thrEff.toFixed(2)} (Try ${tryIndex}/${maxTries})`; }
     }else{
-      if(passB && (!passP || pB>=pP)){ suggested='B'; txt=`p-hat_B = ${pB.toFixed(3)} ≥ ${thrEff.toFixed(2)} (Try ${tryIndex}/${maxTries})`; }
-      else if(passP && (!passB || pP>pB)){ suggested='P'; txt=`p-hat_P = ${pP.toFixed(3)} ≥ ${thrEff.toFixed(2)} (Try ${tryIndex}/${maxTries})`; }
+      if(passB && (!passP || pB>=pP)) suggested='B';
+      else if(passP && (!passB || pP>pB)) suggested='P';
+      if(suggested){
+        const lead = Math.abs(pB - pP);
+        if (lead < STRICT.dominanceDelta) {
+          suggested=null;
+          txt = `margin<${(STRICT.dominanceDelta*100).toFixed(1)}bp: pB=${pB.toFixed(3)}, pP=${pP.toFixed(3)}, thr*=${thrEff.toFixed(2)}`;
+        }else{
+          txt = (suggested==='B'
+                 ? `p-hat_B = ${pB.toFixed(3)} ≥ ${thrEff.toFixed(2)} (Δ=${(lead*100).toFixed(1)}bp)`
+                 : `p-hat_P = ${pP.toFixed(3)} ≥ ${thrEff.toFixed(2)} (Δ=${(lead*100).toFixed(1)}bp)`)
+               + ` (Try ${tryIndex}/${maxTries})`;
+        }
+      }
     }
 
     if(suggested){
@@ -543,7 +578,7 @@
       if(!state.cycle.active){ state.cycle.active=true; state.cycle.tries=0; }
       setCycle('ACTIVE',`Try ${state.cycle.tries+1}/${state.cycle.max}`,state.cycle.lastSuggested);
     }else{
-      setHUD('SKIP',`pB=${pB.toFixed(3)}, pP=${pP.toFixed(3)}, thr*=${thrEff.toFixed(2)} (Try ${tryIndex}/${maxTries})`);
+      setHUD('SKIP', txt || `pB=${pB.toFixed(3)}, pP=${pP.toFixed(3)}, thr*=${thrEff.toFixed(2)} (Try ${tryIndex}/${maxTries})`);
       setCycle(state.cycle.active?'ACTIVE':'IDLE',
                state.cycle.active?`Try ${state.cycle.tries+1}/${state.cycle.max}`:'รอสแกน',
                state.cycle.lastSuggested);
@@ -556,6 +591,7 @@
     const kKey = String(Math.min(5, (state.cycle.tries||0) + 1));
     state.cycleStats.hitsAt[kKey] = Number(state.cycleStats.hitsAt[kKey] || 0) + 1;
     state.cycleStats.total = Number(state.cycleStats.total || 0) + 1;
+    state.cycle.missedLast = false;
     const pause=clamp(el.pauseHands.value,0,10);
     state.cycle.active=false; state.cycle.tries=0; state.cycle.pauseRemain=pause;
     setCycle('HIT',`พัก ${pause} ไม้`, state.cycle.lastSuggested);
@@ -563,6 +599,7 @@
   }
   function missOrFail(){
     const Nmax=state.cycle.max; if(!state.cycle.active) return;
+    state.cycle.missedLast = true;
     if(state.cycle.tries+1>=Nmax){
       state.cycle.active=false; state.cycle.tries=0;
       state.cycleStats.fail = Number(state.cycleStats.fail || 0) + 1;
@@ -581,7 +618,7 @@
     return {
       active:false, max: parseInt(el.cycleMax.value,10), tries:0, pauseRemain:0,
       pendingSignal:null, pendingIndex:-1, lastSuggested:'–',
-      justUnpaused:false
+      justUnpaused:false, missedLast:false
     };
   }
   function resetCycleStats(){ state.cycleStats = { hitsAt:{}, fail:0, total:0 }; renderCycleSummary(); }
@@ -597,13 +634,11 @@
   /* -------------------- Events -------------------- */
   function push(ch){ state.seq.push(ch); renderTimeline(); statsAll(); afterRecord(ch); decide(); saveState(); }
   function afterRecord(outcome){
-    // ลดตัวนับพัก และตั้งธงเมื่อพ้นช่วงพัก
     if(state.cycle.pauseRemain>0){
       state.cycle.pauseRemain--;
       if (state.cycle.pauseRemain === 0) state.cycle.justUnpaused = true;
       return;
     }
-    // ตัดสินผลของสัญญาณล่าสุด
     if(state.cycle.pendingSignal!=null && state.cycle.pendingIndex===state.seq.length-1){
       const side=state.cycle.pendingSignal; state.cycle.pendingSignal=null; state.cycle.pendingIndex=-1;
       if(outcome==='T'){ if(el.tieNoCount.checked){return;} else {missOrFail(); saveState(); return;} }
@@ -613,9 +648,11 @@
   }
 
   // Buttons
-  el.btnB.onclick=()=>push('B'); el.btnP.onclick=()=>push('P'); el.btnT.onclick=()=>push('T');
-  el.btnUndo.onclick=()=>{ if(state.seq.length===0) return; replayAll(state.seq.slice(0,-1)); saveState(); };
-  el.btnReset.onclick=()=>{ if(confirm('ล้างข้อมูลทั้งหมดและรีเซ็ตสถานะใช่ไหม?')){ state.seq=[]; state.cycle=resetCycle(); resetCycleStats(); renderTimeline(); statsAll(); decide(); saveState(); } };
+  $('btnB').onclick=()=>push('B');
+  $('btnP').onclick=()=>push('P');
+  $('btnT').onclick=()=>push('T');
+  $('btnUndo').onclick=()=>{ if(state.seq.length===0) return; replayAll(state.seq.slice(0,-1)); saveState(); };
+  $('btnReset').onclick=()=>{ if(confirm('ล้างข้อมูลทั้งหมดและรีเซ็ตสถานะใช่ไหม?')){ state.seq=[]; state.cycle=resetCycle(); resetCycleStats(); renderTimeline(); statsAll(); decide(); saveState(); } };
 
   // Inputs → recalc + save
   ['entryMode','winN','thr','antiPing','skipAfterTie','useEMA','emaAlpha','cycleMax','tieNoCount']
@@ -646,6 +683,8 @@
   }
 
   /* -------------------- Init -------------------- */
+  function renderTimeline(){ el.timeline.innerHTML=''; state.seq.forEach(ch=>{ const d=document.createElement('div'); d.className='dot '+ch.toLowerCase(); d.title=ch; el.timeline.appendChild(d); }); }
+  function statsAll(){ const n=state.seq.length,b=state.seq.filter(x=>'B'===x).length,p=state.seq.filter(x=>'P'===x).length,t=n-b-p; el.stN.textContent=n; el.stB.textContent=b; el.stP.textContent=p; el.stT.textContent=t; }
   function saveState(){ saveAll(serializeAll()); }
   function renderInit(){ renderTimeline(); statsAll(); renderCycleSummary(); decide(); }
   renderInit(); restoreAll();
